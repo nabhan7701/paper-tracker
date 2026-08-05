@@ -15,7 +15,7 @@
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
             <div class="h-3 w-3 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span class="font-bold tracking-wider text-lg">JARVIS // <span class="text-emerald-400 font-mono text-sm">PAPER_TRACKER v3.0</span></span>
+            <span class="font-bold tracking-wider text-lg">JARVIS // <span class="text-emerald-400 font-mono text-sm">PAPER_TRACKER v4.0</span></span>
         </div>
         <div class="flex items-center space-x-3">
             <button @click="exportData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">Export Backup</button>
@@ -26,49 +26,61 @@
     <!-- Main Content Area -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
 
-        <!-- Interactive Metrics Overview Grid (Click to Filter) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Total Card -->
-            <button @click="currentFilter = 'All'" class="text-left bg-slate-900/80 border p-5 rounded-xl transition hover:border-slate-600 shadow-lg relative group"
+        <!-- 6-Card Interactive Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            
+            <!-- Total -->
+            <button @click="currentFilter = 'All'" class="text-left bg-slate-900/80 border p-4 rounded-xl transition hover:border-slate-500 relative group shadow"
                 :class="currentFilter === 'All' ? 'border-emerald-500 ring-1 ring-emerald-500' : 'border-slate-800'">
-                <div class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 group-hover:text-slate-300">Click to filter 🔍</div>
-                <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Manuscripts</p>
-                <p class="text-3xl font-bold mt-2 text-slate-100" x-text="papers.length"></p>
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Total</p>
+                <p class="text-2xl font-bold mt-1 text-slate-100" x-text="papers.length"></p>
             </button>
 
-            <!-- Under Review Card -->
-            <button @click="currentFilter = 'Under Review'" class="text-left bg-slate-900/80 border p-5 rounded-xl transition hover:border-amber-600/50 shadow-lg relative group"
+            <!-- Drafting -->
+            <button @click="currentFilter = 'Drafting'" class="text-left bg-slate-900/80 border p-4 rounded-xl transition hover:border-slate-500 relative group shadow"
+                :class="currentFilter === 'Drafting' ? 'border-slate-400 ring-1 ring-slate-400' : 'border-slate-800'">
+                <p class="text-[10px] text-slate-300 font-medium uppercase tracking-wider">Drafting</p>
+                <p class="text-2xl font-bold mt-1 text-slate-200" x-text="papers.filter(p => p.status === 'Drafting').length"></p>
+            </button>
+
+            <!-- Under Review -->
+            <button @click="currentFilter = 'Under Review'" class="text-left bg-slate-900/80 border p-4 rounded-xl transition hover:border-amber-500/50 relative group shadow"
                 :class="currentFilter === 'Under Review' ? 'border-amber-500 ring-1 ring-amber-500' : 'border-slate-800'">
-                <div class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 group-hover:text-amber-400">Click to filter 🔍</div>
-                <p class="text-xs text-amber-400 font-medium uppercase tracking-wider">Under Review</p>
-                <p class="text-3xl font-bold mt-2 text-amber-300" x-text="papers.filter(p => p.status === 'Under Review').length"></p>
+                <p class="text-[10px] text-amber-400 font-medium uppercase tracking-wider">Review</p>
+                <p class="text-2xl font-bold mt-1 text-amber-300" x-text="papers.filter(p => p.status === 'Under Review').length"></p>
             </button>
 
-            <!-- Accepted Card -->
-            <button @click="currentFilter = 'Accepted'" class="text-left bg-slate-900/80 border p-5 rounded-xl transition hover:border-emerald-600/50 shadow-lg relative group"
+            <!-- Revise & Resubmit -->
+            <button @click="currentFilter = 'Revise & Resubmit'" class="text-left bg-slate-900/80 border p-4 rounded-xl transition hover:border-blue-500/50 relative group shadow"
+                :class="currentFilter === 'Revise & Resubmit' ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-800'">
+                <p class="text-[10px] text-blue-400 font-medium uppercase tracking-wider">Revise</p>
+                <p class="text-2xl font-bold mt-1 text-blue-300" x-text="papers.filter(p => p.status === 'Revise & Resubmit').length"></p>
+            </button>
+
+            <!-- Accepted -->
+            <button @click="currentFilter = 'Accepted'" class="text-left bg-slate-900/80 border p-4 rounded-xl transition hover:border-emerald-500/50 relative group shadow"
                 :class="currentFilter === 'Accepted' ? 'border-emerald-500 ring-1 ring-emerald-500' : 'border-slate-800'">
-                <div class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 group-hover:text-emerald-400">Click to filter 🔍</div>
-                <p class="text-xs text-emerald-400 font-medium uppercase tracking-wider">Accepted / Published</p>
-                <p class="text-3xl font-bold mt-2 text-emerald-300" x-text="papers.filter(p => p.status === 'Accepted').length"></p>
+                <p class="text-[10px] text-emerald-400 font-medium uppercase tracking-wider">Accepted</p>
+                <p class="text-2xl font-bold mt-1 text-emerald-300" x-text="papers.filter(p => p.status === 'Accepted').length"></p>
             </button>
 
-            <!-- Revisions / Rejected Card -->
-            <button @click="currentFilter = 'Revisions'" class="text-left bg-slate-900/80 border p-5 rounded-xl transition hover:border-rose-600/50 shadow-lg relative group"
-                :class="currentFilter === 'Revisions' ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-800'">
-                <div class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 group-hover:text-rose-400">Click to filter 🔍</div>
-                <p class="text-xs text-rose-400 font-medium uppercase tracking-wider">Revisions / Rejected</p>
-                <p class="text-3xl font-bold mt-2 text-rose-300" x-text="papers.filter(p => p.status === 'Rejected' || p.status === 'Revise & Resubmit' || p.status === 'Drafting').length"></p>
+            <!-- Rejected -->
+            <button @click="currentFilter = 'Rejected'" class="text-left bg-slate-900/80 border p-4 rounded-xl transition hover:border-rose-500/50 relative group shadow"
+                :class="currentFilter === 'Rejected' ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-800'">
+                <p class="text-[10px] text-rose-400 font-medium uppercase tracking-wider">Rejected</p>
+                <p class="text-2xl font-bold mt-1 text-rose-300" x-text="papers.filter(p => p.status === 'Rejected').length"></p>
             </button>
+
         </div>
 
-        <!-- Papers Table Section with Lock/Unlock Feature -->
+        <!-- Papers Table Section -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
             <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/40">
                 <div class="flex items-center space-x-3">
                     <h2 class="font-semibold text-slate-200">Active Pipeline</h2>
-                    <span class="text-xs bg-slate-800 text-emerald-400 px-2.5 py-1 rounded-full font-mono border border-slate-700" x-text="'Showing: ' + currentFilter"></span>
+                    <span class="text-xs bg-slate-800 text-emerald-400 px-2.5 py-1 rounded-full font-mono border border-slate-700" x-text="'Filter: ' + currentFilter"></span>
                 </div>
-                <span class="text-xs text-slate-400 font-mono">🔒 Rows are locked by default to prevent accidental edits</span>
+                <span class="text-xs text-slate-400 font-mono">🔒 Click 'Edit' to unlock row changes</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
@@ -139,7 +151,7 @@
                                                 'bg-slate-800 text-slate-300': paper.status === 'Drafting',
                                                 'bg-amber-950/60 text-amber-400 border border-amber-800/50': paper.status === 'Under Review',
                                                 'bg-blue-950/60 text-blue-400 border border-blue-800/50': paper.status === 'Revise & Resubmit',
-                                                'bg-emerald-950/60 text-emerald-400 border border-emerald-800/50': paper.status === 'Accepted',
+                                                'bg-emerald-950/60 text-emerald-400 border border-emerald-900/50': paper.status === 'Accepted',
                                                 'bg-rose-950/60 text-rose-400 border border-rose-800/50': paper.status === 'Rejected'
                                             }"
                                             x-text="paper.status">
@@ -171,7 +183,7 @@
                                     <span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700" x-text="calculateDays(paper.date) + ' days'"></span>
                                 </td>
 
-                                <!-- Actions (Edit / Save / Delete) -->
+                                <!-- Actions -->
                                 <td class="px-6 py-4 text-right space-y-1">
                                     <div>
                                         <template x-if="!paper.isEditing">
@@ -182,7 +194,7 @@
                                         </template>
                                     </div>
                                     <div>
-                                        <button @click="deletePaper(paper.id)" class="text-slate-500 hover:text-rose-400 transition text-xs pt-1">Delete</button>
+                                        <button @click="confirmDelete(paper.id)" class="text-slate-500 hover:text-rose-400 transition text-xs pt-1">Delete</button>
                                     </div>
                                 </td>
                             </tr>
@@ -197,6 +209,19 @@
             </div>
         </div>
     </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div x-show="showDeleteModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+        <div @click.away="showDeleteModal = false" class="bg-slate-900 border border-slate-800 rounded-xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
+            <div class="h-12 w-12 bg-rose-950/60 border border-rose-900 text-rose-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">⚠️</div>
+            <h3 class="text-lg font-bold text-slate-100">Delete Manuscript?</h3>
+            <p class="text-xs text-slate-400">Are you sure you want to permanently remove this paper record from your Jarvis tracker? This action cannot be undone.</p>
+            <div class="flex justify-center space-x-3 pt-2">
+                <button @click="showDeleteModal = false; paperToDelete = null;" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-4 py-2 rounded-lg transition">Cancel</button>
+                <button @click="executeDelete()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Document Preview Slide-out Drawer -->
     <div x-show="showDrawer" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex justify-end" style="display: none;">
@@ -276,6 +301,8 @@
             return {
                 openModal: false,
                 showDrawer: false,
+                showDeleteModal: false,
+                paperToDelete: null,
                 activePreviewLink: '',
                 activePaperTitle: '',
                 currentFilter: 'All',
@@ -286,10 +313,7 @@
                 
                 get filteredPapers() {
                     if (this.currentFilter === 'All') return this.papers;
-                    if (this.currentFilter === 'Under Review') return this.papers.filter(p => p.status === 'Under Review');
-                    if (this.currentFilter === 'Accepted') return this.papers.filter(p => p.status === 'Accepted');
-                    if (this.currentFilter === 'Revisions') return this.papers.filter(p => p.status === 'Rejected' || p.status === 'Revise & Resubmit' || p.status === 'Drafting');
-                    return this.papers;
+                    return this.papers.filter(p => p.status === this.currentFilter);
                 },
 
                 calculateDays(dateString) {
@@ -309,16 +333,24 @@
                     this.activePreviewLink = url;
                     this.showDrawer = true;
                 },
+                confirmDelete(id) {
+                    this.paperToDelete = id;
+                    this.showDeleteModal = true;
+                },
+                executeDelete() {
+                    if (this.paperToDelete !== null) {
+                        this.papers = this.papers.filter(p => p.id !== this.paperToDelete);
+                        this.save();
+                    }
+                    this.showDeleteModal = false;
+                    this.paperToDelete = null;
+                },
                 addPaper() {
                     if (!this.newPaper.title) return;
                     this.papers.push({ id: Date.now(), ...this.newPaper, isEditing: false });
                     this.save();
                     this.newPaper = { title: '', journal: '', journalLink: '', docLink: '', notes: '', status: 'Under Review', date: new Date().toISOString().split('T')[0] };
                     this.openModal = false;
-                },
-                deletePaper(id) {
-                    this.papers = this.papers.filter(p => p.id !== id);
-                    this.save();
                 },
                 save() {
                     localStorage.setItem('paper_tracker_data', JSON.stringify(this.papers));
