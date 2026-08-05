@@ -50,13 +50,13 @@
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
             <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center">
                 <h2 class="font-semibold text-slate-200">Active Pipeline & Tracking</h2>
-                <span class="text-xs text-slate-500 font-mono">Auto-calculating active review days</span>
+                <span class="text-xs text-slate-500 font-mono">Drive Account: drhan7701@gmail.com</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-slate-950/50 text-slate-400 uppercase text-xs tracking-wider border-b border-slate-800">
                         <tr>
-                            <th class="px-6 py-3">Title & Links</th>
+                            <th class="px-6 py-3">Title & Drive Folder</th>
                             <th class="px-6 py-3">Target Journal</th>
                             <th class="px-6 py-3">Stage / Status</th>
                             <th class="px-6 py-3">Submission Date</th>
@@ -71,7 +71,7 @@
                                     <div class="font-medium text-slate-200" x-text="paper.title"></div>
                                     <div class="flex space-x-3 mt-1 text-xs">
                                         <template x-if="paper.docLink">
-                                            <a :href="paper.docLink" target="_blank" class="text-emerald-400 hover:underline flex items-center gap-1">📄 View Document</a>
+                                            <a :href="paper.docLink" target="_blank" class="text-emerald-400 hover:underline flex items-center gap-1 font-mono">📁 GDrive Folder (drhan7701)</a>
                                         </template>
                                     </div>
                                 </td>
@@ -135,8 +135,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Document Link (Google Drive / OneDrive URL)</label>
-                    <input type="url" x-model="newPaper.docLink" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Paste link to your manuscript draft file">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Google Drive Folder Link (drhan7701@gmail.com)</label>
+                    <input type="url" x-model="newPaper.docLink" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Paste Google Drive folder link here">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
