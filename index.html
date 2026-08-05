@@ -15,7 +15,7 @@
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
             <div class="h-3 w-3 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span class="font-bold tracking-wider text-lg">JARVIS // <span class="text-emerald-400 font-mono text-sm">PAPER_TRACKER v2.0</span></span>
+            <span class="font-bold tracking-wider text-lg">JARVIS // <span class="text-emerald-400 font-mono text-sm">PAPER_TRACKER v3.0</span></span>
         </div>
         <div class="flex items-center space-x-3">
             <button @click="exportData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">Export Backup</button>
@@ -26,31 +26,49 @@
     <!-- Main Content Area -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
 
-        <!-- Metrics Overview Grid -->
+        <!-- Interactive Metrics Overview Grid (Click to Filter) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+            <!-- Total Card -->
+            <button @click="currentFilter = 'All'" class="text-left bg-slate-900/80 border p-5 rounded-xl transition hover:border-slate-600 shadow-lg relative group"
+                :class="currentFilter === 'All' ? 'border-emerald-500 ring-1 ring-emerald-500' : 'border-slate-800'">
+                <div class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 group-hover:text-slate-300">Click to filter 🔍</div>
                 <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Total Manuscripts</p>
                 <p class="text-3xl font-bold mt-2 text-slate-100" x-text="papers.length"></p>
-            </div>
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+            </button>
+
+            <!-- Under Review Card -->
+            <button @click="currentFilter = 'Under Review'" class="text-left bg-slate-900/80 border p-5 rounded-xl transition hover:border-amber-600/50 shadow-lg relative group"
+                :class="currentFilter === 'Under Review' ? 'border-amber-500 ring-1 ring-amber-500' : 'border-slate-800'">
+                <div class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 group-hover:text-amber-400">Click to filter 🔍</div>
                 <p class="text-xs text-amber-400 font-medium uppercase tracking-wider">Under Review</p>
                 <p class="text-3xl font-bold mt-2 text-amber-300" x-text="papers.filter(p => p.status === 'Under Review').length"></p>
-            </div>
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+            </button>
+
+            <!-- Accepted Card -->
+            <button @click="currentFilter = 'Accepted'" class="text-left bg-slate-900/80 border p-5 rounded-xl transition hover:border-emerald-600/50 shadow-lg relative group"
+                :class="currentFilter === 'Accepted' ? 'border-emerald-500 ring-1 ring-emerald-500' : 'border-slate-800'">
+                <div class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 group-hover:text-emerald-400">Click to filter 🔍</div>
                 <p class="text-xs text-emerald-400 font-medium uppercase tracking-wider">Accepted / Published</p>
                 <p class="text-3xl font-bold mt-2 text-emerald-300" x-text="papers.filter(p => p.status === 'Accepted').length"></p>
-            </div>
-            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+            </button>
+
+            <!-- Revisions / Rejected Card -->
+            <button @click="currentFilter = 'Revisions'" class="text-left bg-slate-900/80 border p-5 rounded-xl transition hover:border-rose-600/50 shadow-lg relative group"
+                :class="currentFilter === 'Revisions' ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-800'">
+                <div class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 group-hover:text-rose-400">Click to filter 🔍</div>
                 <p class="text-xs text-rose-400 font-medium uppercase tracking-wider">Revisions / Rejected</p>
-                <p class="text-3xl font-bold mt-2 text-rose-300" x-text="papers.filter(p => p.status === 'Rejected' || p.status === 'Revise & Resubmit').length"></p>
-            </div>
+                <p class="text-3xl font-bold mt-2 text-rose-300" x-text="papers.filter(p => p.status === 'Rejected' || p.status === 'Revise & Resubmit' || p.status === 'Drafting').length"></p>
+            </button>
         </div>
 
-        <!-- Papers Table Section with Inline Editing -->
+        <!-- Papers Table Section with Lock/Unlock Feature -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
-            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center">
-                <h2 class="font-semibold text-slate-200">Active Pipeline & Inline Editor</h2>
-                <span class="text-xs text-emerald-400 font-mono">✨ Click any field or dropdown in the table to edit instantly</span>
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/40">
+                <div class="flex items-center space-x-3">
+                    <h2 class="font-semibold text-slate-200">Active Pipeline</h2>
+                    <span class="text-xs bg-slate-800 text-emerald-400 px-2.5 py-1 rounded-full font-mono border border-slate-700" x-text="'Showing: ' + currentFilter"></span>
+                </div>
+                <span class="text-xs text-slate-400 font-mono">🔒 Rows are locked by default to prevent accidental edits</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
@@ -65,52 +83,87 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/60">
-                        <template x-for="paper in papers" :key="paper.id">
-                            <tr class="hover:bg-slate-800/40 transition align-top">
-                                <!-- Title & Notes (Editable inline) -->
+                        <template x-for="paper in filteredPapers" :key="paper.id">
+                            <tr class="hover:bg-slate-800/40 transition align-top" :class="paper.isEditing ? 'bg-slate-900/90 ring-1 ring-emerald-500/50' : ''">
+                                
+                                <!-- Title & Notes -->
                                 <td class="px-6 py-4 space-y-2">
-                                    <input type="text" x-model="paper.title" @input="save()" class="w-full bg-transparent border border-transparent hover:border-slate-700 focus:border-emerald-500 rounded px-1 text-slate-200 font-medium focus:outline-none transition">
-                                    
-                                    <div class="bg-slate-950/60 border border-slate-800 p-2 rounded-lg text-xs space-y-1">
-                                        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">⚠️ Review Notes / Issues:</span>
-                                        <textarea x-model="paper.notes" @input="save()" rows="2" class="w-full bg-transparent border border-transparent hover:border-slate-700 focus:border-emerald-500 rounded text-slate-300 focus:outline-none resize-none" placeholder="Click to add reviewer comments or problems..."></textarea>
-                                    </div>
+                                    <template x-if="!paper.isEditing">
+                                        <div>
+                                            <div class="font-medium text-slate-200 text-base" x-text="paper.title"></div>
+                                            <div class="bg-slate-950/60 border border-slate-800 p-2 rounded-lg text-xs space-y-1 mt-1">
+                                                <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">⚠️ Review Notes / Issues:</span>
+                                                <p x-text="paper.notes || 'No notes added yet.'" class="text-slate-300 italic" :class="paper.notes ? 'not-italic text-slate-300' : 'text-slate-600'"></p>
+                                            </div>
+                                            <div class="flex items-center space-x-3 text-xs pt-2">
+                                                <template x-if="paper.docLink">
+                                                    <button @click="openPreview(paper)" class="text-emerald-400 hover:underline flex items-center gap-1 font-mono bg-emerald-950/40 border border-emerald-900/50 px-2 py-1 rounded">👁️ Preview Document</button>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
 
-                                    <div class="flex items-center space-x-3 text-xs pt-1">
-                                        <template x-if="paper.docLink">
-                                            <button @click="openPreview(paper)" class="text-emerald-400 hover:underline flex items-center gap-1 font-mono bg-emerald-950/40 border border-emerald-900/50 px-2 py-1 rounded">👁️ Preview Document</button>
-                                        </template>
-                                        <input type="url" x-model="paper.docLink" @input="save()" placeholder="Paste Drive Link..." class="w-48 bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-slate-400 focus:outline-none focus:border-emerald-500">
-                                    </div>
+                                    <!-- Editable View -->
+                                    <template x-if="paper.isEditing">
+                                        <div class="space-y-2">
+                                            <input type="text" x-model="paper.title" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded px-2 py-1 text-slate-200 font-medium focus:outline-none">
+                                            <textarea x-model="paper.notes" rows="2" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none" placeholder="Reviewer comments or problems..."></textarea>
+                                            <input type="url" x-model="paper.docLink" placeholder="Google Drive Link..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-slate-400 focus:outline-none focus:border-emerald-500">
+                                        </div>
+                                    </template>
                                 </td>
 
-                                <!-- Target Journal (Editable inline) -->
+                                <!-- Target Journal -->
                                 <td class="px-6 py-4 space-y-1">
-                                    <input type="text" x-model="paper.journal" @input="save()" class="w-full bg-transparent border border-transparent hover:border-slate-700 focus:border-emerald-500 rounded px-1 text-slate-300 focus:outline-none transition" placeholder="Journal Name">
-                                    <input type="url" x-model="paper.journalLink" @input="save()" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-blue-400 focus:outline-none focus:border-emerald-500" placeholder="Journal URL">
+                                    <template x-if="!paper.isEditing">
+                                        <div>
+                                            <span class="font-medium text-slate-300 block" x-text="paper.journal"></span>
+                                            <template x-if="paper.journalLink">
+                                                <a :href="paper.journalLink" target="_blank" class="text-xs text-blue-400 hover:underline truncate block max-w-[150px]" x-text="paper.journalLink"></a>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template x-if="paper.isEditing">
+                                        <div class="space-y-1">
+                                            <input type="text" x-model="paper.journal" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none focus:border-emerald-500" placeholder="Journal Name">
+                                            <input type="url" x-model="paper.journalLink" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-[10px] text-blue-400 focus:outline-none focus:border-emerald-500" placeholder="Journal URL">
+                                        </div>
+                                    </template>
                                 </td>
 
-                                <!-- Status Dropdown (Editable inline) -->
+                                <!-- Stage / Status -->
                                 <td class="px-6 py-4">
-                                    <select x-model="paper.status" @change="save()" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
-                                        :class="{
-                                            'text-slate-300': paper.status === 'Drafting',
-                                            'text-amber-400': paper.status === 'Under Review',
-                                            'text-blue-400': paper.status === 'Revise & Resubmit',
-                                            'text-emerald-400': paper.status === 'Accepted',
-                                            'text-rose-400': paper.status === 'Rejected'
-                                        }">
-                                        <option>Drafting</option>
-                                        <option>Under Review</option>
-                                        <option>Revise & Resubmit</option>
-                                        <option>Accepted</option>
-                                        <option>Rejected</option>
-                                    </select>
+                                    <template x-if="!paper.isEditing">
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold inline-block"
+                                            :class="{
+                                                'bg-slate-800 text-slate-300': paper.status === 'Drafting',
+                                                'bg-amber-950/60 text-amber-400 border border-amber-800/50': paper.status === 'Under Review',
+                                                'bg-blue-950/60 text-blue-400 border border-blue-800/50': paper.status === 'Revise & Resubmit',
+                                                'bg-emerald-950/60 text-emerald-400 border border-emerald-800/50': paper.status === 'Accepted',
+                                                'bg-rose-950/60 text-rose-400 border border-rose-800/50': paper.status === 'Rejected'
+                                            }"
+                                            x-text="paper.status">
+                                        </span>
+                                    </template>
+                                    <template x-if="paper.isEditing">
+                                        <select x-model="paper.status" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-emerald-500">
+                                            <option>Drafting</option>
+                                            <option>Under Review</option>
+                                            <option>Revise & Resubmit</option>
+                                            <option>Accepted</option>
+                                            <option>Rejected</option>
+                                        </select>
+                                    </template>
                                 </td>
 
-                                <!-- Submission Date (Editable inline) -->
-                                <td class="px-6 py-4">
-                                    <input type="date" x-model="paper.date" @change="save()" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 font-mono focus:outline-none focus:border-emerald-500">
+                                <!-- Submission Date -->
+                                <td class="px-6 py-4 font-mono text-xs">
+                                    <template x-if="!paper.isEditing">
+                                        <span class="text-slate-300" x-text="paper.date"></span>
+                                    </template>
+                                    <template x-if="paper.isEditing">
+                                        <input type="date" x-model="paper.date" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none focus:border-emerald-500">
+                                    </template>
                                 </td>
 
                                 <!-- Review Age Tracker -->
@@ -118,15 +171,25 @@
                                     <span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700" x-text="calculateDays(paper.date) + ' days'"></span>
                                 </td>
 
-                                <!-- Delete Action -->
-                                <td class="px-6 py-4 text-right">
-                                    <button @click="deletePaper(paper.id)" class="text-slate-500 hover:text-rose-400 transition text-xs">Delete</button>
+                                <!-- Actions (Edit / Save / Delete) -->
+                                <td class="px-6 py-4 text-right space-y-1">
+                                    <div>
+                                        <template x-if="!paper.isEditing">
+                                            <button @click="paper.isEditing = true" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded transition">🔒 Edit</button>
+                                        </template>
+                                        <template x-if="paper.isEditing">
+                                            <button @click="paper.isEditing = false; save();" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-2.5 py-1 rounded transition shadow">💾 Save</button>
+                                        </template>
+                                    </div>
+                                    <div>
+                                        <button @click="deletePaper(paper.id)" class="text-slate-500 hover:text-rose-400 transition text-xs pt-1">Delete</button>
+                                    </div>
                                 </td>
                             </tr>
                         </template>
-                        <template x-if="papers.length === 0">
+                        <template x-if="filteredPapers.length === 0">
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center text-slate-500 italic">No manuscripts tracked yet. Click "+ Add Manuscript" to begin.</td>
+                                <td colspan="6" class="px-6 py-12 text-center text-slate-500 italic">No manuscripts found for filter: <span class="font-mono text-slate-300" x-text="currentFilter"></span></td>
                             </tr>
                         </template>
                     </tbody>
@@ -215,10 +278,20 @@
                 showDrawer: false,
                 activePreviewLink: '',
                 activePaperTitle: '',
+                currentFilter: 'All',
                 papers: JSON.parse(localStorage.getItem('paper_tracker_data')) || [
-                    { id: 1, title: 'Human Error in High-Hazard Chemical Processes', journal: 'JLPPI', journalLink: 'https://www.sciencedirect.com', docLink: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', notes: 'Reviewer 1 requested minor clarification on human reliability probability scales.', status: 'Under Review', date: '2026-02-15' }
+                    { id: 1, title: 'Human Error in High-Hazard Chemical Processes', journal: 'JLPPI', journalLink: 'https://www.sciencedirect.com', docLink: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', notes: 'Reviewer 1 requested minor clarification on human reliability probability scales.', status: 'Under Review', date: '2026-02-15', isEditing: false }
                 ],
                 newPaper: { title: '', journal: '', journalLink: '', docLink: '', notes: '', status: 'Under Review', date: new Date().toISOString().split('T')[0] },
+                
+                get filteredPapers() {
+                    if (this.currentFilter === 'All') return this.papers;
+                    if (this.currentFilter === 'Under Review') return this.papers.filter(p => p.status === 'Under Review');
+                    if (this.currentFilter === 'Accepted') return this.papers.filter(p => p.status === 'Accepted');
+                    if (this.currentFilter === 'Revisions') return this.papers.filter(p => p.status === 'Rejected' || p.status === 'Revise & Resubmit' || p.status === 'Drafting');
+                    return this.papers;
+                },
+
                 calculateDays(dateString) {
                     if (!dateString) return 0;
                     const subDate = new Date(dateString);
@@ -230,7 +303,6 @@
                 openPreview(paper) {
                     this.activePaperTitle = paper.title;
                     let url = paper.docLink;
-                    // Format Google Drive links into embed-friendly preview links automatically
                     if (url.includes('drive.google.com') && url.includes('/view')) {
                         url = url.replace('/view?usp=sharing', '/preview').replace('/view', '/preview');
                     }
@@ -239,7 +311,7 @@
                 },
                 addPaper() {
                     if (!this.newPaper.title) return;
-                    this.papers.push({ id: Date.now(), ...this.newPaper });
+                    this.papers.push({ id: Date.now(), ...this.newPaper, isEditing: false });
                     this.save();
                     this.newPaper = { title: '', journal: '', journalLink: '', docLink: '', notes: '', status: 'Under Review', date: new Date().toISOString().split('T')[0] };
                     this.openModal = false;
