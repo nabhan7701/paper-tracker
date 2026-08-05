@@ -15,7 +15,7 @@
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
             <div class="h-3 w-3 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span class="font-bold tracking-wider text-lg">JARVIS // <span class="text-emerald-400 font-mono text-sm">PAPER_TRACKER v1.0</span></span>
+            <span class="font-bold tracking-wider text-lg">JARVIS // <span class="text-emerald-400 font-mono text-sm">PAPER_TRACKER v1.1</span></span>
         </div>
         <div class="flex items-center space-x-3">
             <button @click="exportData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">Export Backup</button>
@@ -50,28 +50,33 @@
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
             <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center">
                 <h2 class="font-semibold text-slate-200">Active Pipeline & Tracking</h2>
-                <span class="text-xs text-slate-500 font-mono">Drive Account: drhan7701@gmail.com</span>
+                <span class="text-xs text-slate-500 font-mono">Account: drhan7701@gmail.com</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-slate-950/50 text-slate-400 uppercase text-xs tracking-wider border-b border-slate-800">
                         <tr>
-                            <th class="px-6 py-3">Title & Drive Folder</th>
+                            <th class="px-6 py-3">Title & Notes</th>
                             <th class="px-6 py-3">Target Journal</th>
                             <th class="px-6 py-3">Stage / Status</th>
                             <th class="px-6 py-3">Submission Date</th>
-                            <th class="px-6 py-3">Review Age Tracker</th>
+                            <th class="px-6 py-3">Review Age</th>
                             <th class="px-6 py-3 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/60">
                         <template x-for="paper in papers" :key="paper.id">
-                            <tr class="hover:bg-slate-800/40 transition">
-                                <td class="px-6 py-4">
-                                    <div class="font-medium text-slate-200" x-text="paper.title"></div>
-                                    <div class="flex space-x-3 mt-1 text-xs">
+                            <tr class="hover:bg-slate-800/40 transition align-top">
+                                <td class="px-6 py-4 space-y-2">
+                                    <div class="font-medium text-slate-200 text-base" x-text="paper.title"></div>
+                                    <!-- Notes/Problems Section -->
+                                    <div v-if="paper.notes" class="bg-slate-950/60 border border-slate-800 p-2.5 rounded-lg text-xs text-slate-300">
+                                        <span class="font-bold text-amber-400 uppercase tracking-wider text-[10px] block mb-1">⚠️ Review Notes / Issues:</span>
+                                        <p x-text="paper.notes" class="whitespace-pre-line"></p>
+                                    </div>
+                                    <div class="flex space-x-3 text-xs pt-1">
                                         <template x-if="paper.docLink">
-                                            <a :href="paper.docLink" target="_blank" class="text-emerald-400 hover:underline flex items-center gap-1 font-mono">📁 GDrive Folder (drhan7701)</a>
+                                            <a :href="paper.docLink" target="_blank" class="text-emerald-400 hover:underline flex items-center gap-1 font-mono">📁 Open Drive Link</a>
                                         </template>
                                     </div>
                                 </td>
@@ -135,8 +140,12 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Google Drive Folder Link (drhan7701@gmail.com)</label>
-                    <input type="url" x-model="newPaper.docLink" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Paste Google Drive folder link here">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Google Drive Link (drhan7701@gmail.com)</label>
+                    <input type="url" x-model="newPaper.docLink" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="Paste Google Drive file/folder link here">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Review Notes / Problems to Fix</label>
+                    <textarea x-model="newPaper.notes" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500" placeholder="e.g., Reviewer 2 wants more clarity on DEMATEL-AHP matrix calculation..."></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -168,9 +177,9 @@
             return {
                 openModal: false,
                 papers: JSON.parse(localStorage.getItem('paper_tracker_data')) || [
-                    { id: 1, title: 'Human Error in High-Hazard Chemical Processes', journal: 'JLPPI', journalLink: 'https://www.sciencedirect.com', docLink: 'https://drive.google.com', status: 'Under Review', date: '2026-02-15' }
+                    { id: 1, title: 'Human Error in High-Hazard Chemical Processes', journal: 'JLPPI', journalLink: 'https://www.sciencedirect.com', docLink: 'https://drive.google.com', notes: 'Reviewer 1 requested minor clarification on human reliability probability scales.', status: 'Under Review', date: '2026-02-15' }
                 ],
-                newPaper: { title: '', journal: '', journalLink: '', docLink: '', status: 'Under Review', date: new Date().toISOString().split('T')[0] },
+                newPaper: { title: '', journal: '', journalLink: '', docLink: '', notes: '', status: 'Under Review', date: new Date().toISOString().split('T')[0] },
                 calculateDays(dateString) {
                     if (!dateString) return 0;
                     const subDate = new Date(dateString);
@@ -183,7 +192,7 @@
                     if (!this.newPaper.title) return;
                     this.papers.push({ id: Date.now(), ...this.newPaper });
                     this.save();
-                    this.newPaper = { title: '', journal: '', journalLink: '', docLink: '', status: 'Under Review', date: new Date().toISOString().split('T')[0] };
+                    this.newPaper = { title: '', journal: '', journalLink: '', docLink: '', notes: '', status: 'Under Review', date: new Date().toISOString().split('T')[0] };
                     this.openModal = false;
                 },
                 deletePaper(id) {
